@@ -22,7 +22,7 @@ public class GreetingDaoImpl implements GreetingDao {
         try {
             try (InputStream initialDataPropertiesResourceStream = getClass().getClassLoader().getResourceAsStream(initialDataPropertiesResourceName)) {
                 Properties properties = new Properties();
-                properties.load(new InputStreamReader(Objects.requireNonNull(initialDataPropertiesResourceStream), "Windows-1251"));
+                properties.load(new InputStreamReader(Objects.requireNonNull(initialDataPropertiesResourceStream), "UTF-8"));
                 properties.forEach((key, value) -> greetingsByCountryCode.putIfAbsent(((String) key).toUpperCase(), (String) value));
             }
         }catch (Exception e) {
