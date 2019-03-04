@@ -27,10 +27,9 @@ class GreetingDaoImplTest {
     @ParameterizedTest
     @MethodSource("generateData")
     @DisplayName("дожен возвращать не пустое, корректное приветствие для кода указанной страны в любом регистре")
-    void findGreetingByLocale(String countryCode, String expectedGreeting) {
+    void shouldReturnNotEmptyGreetingByCaseInsensitiveCountryCode(String countryCode, String expectedGreeting) {
         Optional<String> greetingOptional = greetingDao.findGreetingByCountryCode(countryCode);
-        assertThat(greetingOptional).isNotEmpty();
-        assertThat(greetingOptional.orElse("")).isEqualTo(expectedGreeting);
+        assertThat(greetingOptional).isNotEmpty().hasValue(expectedGreeting);
     }
 
     private static Stream<Arguments> generateData() {
