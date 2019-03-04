@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static ru.otus.testingExample.services.CountryCodes.*;
 
+// Обчыный юнит-тест. Контекст spring не поднимается
 @DisplayName("Методы сервиса приветствий должны ")
 @ExtendWith(MockitoExtension.class)
 class GreetingServiceImplTest {

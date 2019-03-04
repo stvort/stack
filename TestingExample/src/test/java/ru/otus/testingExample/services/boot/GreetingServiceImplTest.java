@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static ru.otus.testingExample.services.CountryCodes.*;
 
+// Тест с поднятием контекста spring
 @DisplayName("Методы сервиса приветствий должны ")
 @SpringBootTest
 class GreetingServiceImplTest {

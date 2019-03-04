@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+// Обчыный юнит-тест. Контекст spring не поднимается
 @DisplayName("Дао для работы с приветствиями ")
 class GreetingDaoImplTest {
 

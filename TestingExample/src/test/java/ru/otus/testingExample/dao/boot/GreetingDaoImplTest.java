@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+// Тест с поднятием контекста spring
 @DisplayName("Дао для работы с приветствиями ")
 @SpringBootTest
 class GreetingDaoImplTest {
