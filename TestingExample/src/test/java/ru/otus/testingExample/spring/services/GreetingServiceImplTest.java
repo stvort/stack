@@ -1,11 +1,15 @@
-package ru.otus.testingExample.services.boot;
+package ru.otus.testingExample.spring.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.otus.testingExample.TestingExampleSpringApplication;
 import ru.otus.testingExample.dao.GreetingDao;
 import ru.otus.testingExample.services.GreetingNotFoundException;
 import ru.otus.testingExample.services.GreetingService;
@@ -23,7 +27,8 @@ import static ru.otus.testingExample.services.CountryCodes.*;
 
 // Тест с поднятием контекста spring
 @DisplayName("Методы сервиса приветствий должны ")
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TestingExampleSpringApplication.class)
 class GreetingServiceImplTest {
 
     @MockBean

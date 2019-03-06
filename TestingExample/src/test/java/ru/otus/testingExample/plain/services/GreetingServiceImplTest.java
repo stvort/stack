@@ -1,4 +1,4 @@
-package ru.otus.testingExample.services.plain;
+package ru.otus.testingExample.plain.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
