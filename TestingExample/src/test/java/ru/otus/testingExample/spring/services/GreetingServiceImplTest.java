@@ -4,9 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.otus.testingExample.TestingExampleSpringApplication;
@@ -28,20 +27,22 @@ import static ru.otus.testingExample.services.CountryCodes.*;
 // Тест с поднятием контекста spring
 @DisplayName("Методы сервиса приветствий должны ")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestingExampleSpringApplication.class)
+@ContextConfiguration(classes = {TestingExampleSpringApplication.class, TestContextConfig.class})
 class GreetingServiceImplTest {
-
-    @MockBean
-    private IOService ioService;
-
-    @MockBean
-    private GreetingDao greetingDao;
 
     @Autowired
     private GreetingService greetingService;
 
+    @Autowired
+    private IOService ioService;
+
+    @Autowired
+    private GreetingDao greetingDao;
+
+
     @BeforeEach
     void setUp() {
+        Mockito.reset(ioService, greetingDao);
         given(greetingDao.findGreetingByCountryCode(any())).willReturn(Optional.of(""));
     }
 
