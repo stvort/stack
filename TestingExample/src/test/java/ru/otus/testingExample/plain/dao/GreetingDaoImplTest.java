@@ -1,25 +1,28 @@
-package ru.otus.testingExample.dao.boot;
+package ru.otus.testingExample.plain.dao;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.otus.testingExample.dao.GreetingDao;
+import ru.otus.testingExample.dao.GreetingDaoImpl;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// Тест с поднятием контекста spring
+// Обчыный юнит-тест. Контекст spring не поднимается
 @DisplayName("Дао для работы с приветствиями ")
-@SpringBootTest
 class GreetingDaoImplTest {
 
-    @Autowired
     private GreetingDao greetingDao;
+
+    @BeforeEach
+    void setUp() {
+        greetingDao = new GreetingDaoImpl("initial_data/greetings.properties");
+    }
 
     @ParameterizedTest
     @MethodSource("generateData")
