@@ -1,5 +1,7 @@
 package ru.otus.example.mongodbdemo.repositories;
 
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -10,18 +12,14 @@ import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
+@RequiredArgsConstructor
 public class TeacherRepositoryCustomImpl implements TeacherRepositoryCustom {
 
     private final MongoTemplate mongoTemplate;
 
-    public TeacherRepositoryCustomImpl(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
-
-
     @Override
     public List<Knowledge> getTeacherExperienceById(String teacherId) {
-        Aggregation aggregation = newAggregation(
+        val aggregation = newAggregation(
                 match(Criteria.where("id").is(teacherId))
                 , unwind("experience")
                 , project().andExclude("_id").and("experience.id").as("_id").and("experience.name").as("name")

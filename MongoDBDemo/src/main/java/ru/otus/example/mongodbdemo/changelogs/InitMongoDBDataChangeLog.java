@@ -3,6 +3,7 @@ package ru.otus.example.mongodbdemo.changelogs;
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import com.mongodb.client.MongoDatabase;
+import lombok.val;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.example.mongodbdemo.model.Knowledge;
 import ru.otus.example.mongodbdemo.model.Student;
@@ -29,13 +30,13 @@ public class InitMongoDBDataChangeLog {
 
     @ChangeSet(order = "002", id = "initStudents", author = "stvort", runAlways = true)
     public void initStudents(MongoTemplate template){
-        Student student = new Student("Student #1", springDataKnowledge, mongockKnowledge);
+        val student = new Student("Student #1", springDataKnowledge, mongockKnowledge);
         template.save(student);
     }
 
     @ChangeSet(order = "003", id = "Teacher", author = "stvort", runAlways = true)
     public void initTeachers(MongoTemplate template){
-        Teacher teacher = new Teacher("Teacher #1", springDataKnowledge, mongockKnowledge, aggregationApiKnowledge);
+        val teacher = new Teacher("Teacher #1", springDataKnowledge, mongockKnowledge, aggregationApiKnowledge);
         template.save(teacher);
     }
 }

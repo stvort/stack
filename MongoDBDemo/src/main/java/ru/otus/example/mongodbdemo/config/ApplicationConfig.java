@@ -13,9 +13,8 @@ public class ApplicationConfig {
 
     @Bean
     public Mongock mongock(MongoProps mongoProps, MongoClient mongoClient) {
-        Mongock mongock = new SpringMongockBuilder(mongoClient, mongoProps.getDatabase(), CHANGELOGS_PACKAGE)
+        return new SpringMongockBuilder(mongoClient, mongoProps.getDatabase(), CHANGELOGS_PACKAGE)
                 .setLockQuickConfig()
                 .build();
-        return mongock;
     }
 }

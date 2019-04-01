@@ -1,6 +1,8 @@
 package ru.otus.example.mongodbdemo.repositories;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -12,6 +14,8 @@ import ru.otus.example.mongodbdemo.model.Student;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
+// TODO: Рассказать про инжект, через лмобок и val
+@RequiredArgsConstructor
 public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
 
     @Data
@@ -21,22 +25,18 @@ public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
 
     private final MongoTemplate mongoTemplate;
 
-    public StudentRepositoryCustomImpl(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
-
     public long getExperienceArrayLengthByStudentId(String id) {
-        Aggregation aggregation = Aggregation.newAggregation(
+        val aggregation = Aggregation.newAggregation(
                 Aggregation.match(where("id").is(id)),
                 Aggregation.project().andExclude("_id").and("experience").size().as("size"));
 
-        ArraySizeProjection arraySizeProjection = mongoTemplate.aggregate(aggregation, Student.class, ArraySizeProjection.class).getUniqueMappedResult();
+        val arraySizeProjection = mongoTemplate.aggregate(aggregation, Student.class, ArraySizeProjection.class).getUniqueMappedResult();
         return arraySizeProjection == null ? 0 : arraySizeProjection.getSize();
     }
 
     public void removeExperienceArrayElementsById(String id) {
-        Query query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
-        Update update = new Update().pull("experience", query);
+        val query = Query.query(Criteria.where("$id").is(new ObjectId(id)));
+        val update = new Update().pull("experience", query);
         mongoTemplate.updateMulti(new Query(), update, Student.class);
     }
 

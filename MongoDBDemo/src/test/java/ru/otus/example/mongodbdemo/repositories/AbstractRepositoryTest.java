@@ -9,5 +9,5 @@ import org.springframework.test.annotation.DirtiesContext;
 @EnableConfigurationProperties
 @ComponentScan({"ru.otus.example.mongodbdemo.config", "ru.otus.example.mongodbdemo.repositories"})
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
-public abstract class AbstractRepositoryTest {
+abstract class AbstractRepositoryTest {
 }

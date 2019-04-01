@@ -1,5 +1,6 @@
 package ru.otus.example.mongodbdemo.repositories;
 
+import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("KnowledgeRepository при наличии listener-ов в контексте ")
 @ComponentScan("ru.otus.example.mongodbdemo.events")
-public class KnowledgeRepositoryWithListenerTest extends AbstractRepositoryTest {
+class KnowledgeRepositoryWithListenerTest extends AbstractRepositoryTest {
 
     @Autowired
     private KnowledgeRepository knowledgeRepository;
@@ -24,21 +25,21 @@ public class KnowledgeRepositoryWithListenerTest extends AbstractRepositoryTest 
 
     @DisplayName("при удалении Knowledge должен удалить его из опыта студента")
     @Test
-    public void shouldRemoveKnowledgeFromStudentExperienceWhenRemovingKnowledge() {
+    void shouldRemoveKnowledgeFromStudentExperienceWhenRemovingKnowledge() {
 
         // Загрузка студента и его пе
-        List<Student> students = studentRepository.findAll();
-        Student student = students.get(0);
-        List<Knowledge> experience = student.getExperience();
-        Knowledge firstKnowledge = experience.get(0);
+        val students = studentRepository.findAll();
+        val student = students.get(0);
+        val experience = student.getExperience();
+        val firstKnowledge = experience.get(0);
 
         knowledgeRepository.delete(firstKnowledge);
 
-        int expectedExperienceArrayLength = experience.size() - 1;
-        long actualExperienceArrayLength = studentRepository.getExperienceArrayLengthByStudentId(student.getId());
+        val expectedExperienceArrayLength = experience.size() - 1;
+        val actualExperienceArrayLength = studentRepository.getExperienceArrayLengthByStudentId(student.getId());
         assertThat(actualExperienceArrayLength).isEqualTo(expectedExperienceArrayLength);
 
-        Optional<Student> actualStudentOptional = studentRepository.findById(student.getId());
+        val actualStudentOptional = studentRepository.findById(student.getId());
         assertThat(actualStudentOptional.get().getExperience().size()).isEqualTo(expectedExperienceArrayLength);
 
     }

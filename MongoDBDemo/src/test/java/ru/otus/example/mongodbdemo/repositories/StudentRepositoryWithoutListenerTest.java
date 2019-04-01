@@ -1,5 +1,6 @@
 package ru.otus.example.mongodbdemo.repositories;
 
+import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +11,15 @@ import ru.otus.example.mongodbdemo.model.Student;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("StudentRepository при отсутствии listener-ов в контексте ")
-public class StudentRepositoryWithoutListenerTest extends AbstractRepositoryTest {
+class StudentRepositoryWithoutListenerTest extends AbstractRepositoryTest {
 
     @Autowired
     private StudentRepository studentRepository;
 
     @DisplayName("должен кидать MappingException во время сохранения студента с отсутствующими в БД знаниями")
     @Test
-    public void shouldThrowMappingExceptionWhenSaveStudentWithNewKnowledge(){
-        Student student = new Student("Student #2", new Knowledge("Knowledge #3"));
+    void shouldThrowMappingExceptionWhenSaveStudentWithNewKnowledge(){
+        val student = new Student("Student #2", new Knowledge("Knowledge #3"));
         assertThatThrownBy(() -> studentRepository.save(student)).isInstanceOf(MappingException.class);
     }
 }
