@@ -13,12 +13,13 @@
 -->
 </head>
 <body>
+
 <h3>Greetings microservice group API-gateway</h3>
-<div th:text = "${greeting}"></div>
 <a href="common-api/greetings/simple">common-api/greetings/simple</a><br/>
 <a href="common-api/greetings/from-config-server">common-api/greetings/from-config-server</a><br/>
 <a href="common-api/greetings/from-external-service">common-api/greetings/from-external-service</a><br/>
 <a href="common-api/names/random">common-api/names/random</a><br/>
-
+<br/><br/>
+<div th:text = "'Приветствие от API-gateway: ' + ${greeting}"></div>
 </body>
 </html>
