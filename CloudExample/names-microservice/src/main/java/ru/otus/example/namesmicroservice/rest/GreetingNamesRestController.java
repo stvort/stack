@@ -9,8 +9,10 @@ import java.util.Random;
 @RestController
 public class GreetingNamesRestController {
 
-    private static final String[] NAMES = {"Юрий Громобоевич Бдыщ", "Говард Инванович Врумбельшпиц", "Лукас Люкятвойотецович Охничегожсебе",
-    "Демосфен Менделеевич Иртыш", "Уга Чага"};
+    private static final String[] NAMES = {"Юрий Громобоевич Бдыщ",
+            "Говард Инванович Врумбельшпиц",
+            "Лукас Люкятвойотецович Охничегожсебе",
+            "Демосфен Менделеевич Иртыш", "Уга Чага"};
 
     @GetMapping("names/random")
     public String randomName(@Value("${default-form-of-appeal}") String defaultFormOfAppeal){

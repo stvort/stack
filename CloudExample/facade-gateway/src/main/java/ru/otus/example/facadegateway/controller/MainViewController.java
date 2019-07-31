@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MainViewController {
 
     @GetMapping("/")
-    public String mainPage(Model model, @Value("greeting") String greeting) {
+    public String mainPage(Model model, @Value("${greeting}") String greeting) {
         model.addAttribute("greeting", greeting);
         return "index";
     }
