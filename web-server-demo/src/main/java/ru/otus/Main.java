@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.otus.dao.InMemoryUserDao;
 import ru.otus.dao.UserDao;
+import ru.otus.server.SecurityType;
 import ru.otus.server.UsersWebServer;
 import ru.otus.server.UsersWebServerImpl;
 import ru.otus.services.TemplateProcessor;
@@ -20,7 +21,9 @@ public class Main {
         UserAuthService userAuthService = new UserAuthServiceImpl(userDao);
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
-        UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, userAuthService, userDao, gson, templateProcessor);
+
+        UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.BASIC, userAuthService, userDao, gson, templateProcessor);
+
         usersWebServer.start();
         usersWebServer.join();
     }

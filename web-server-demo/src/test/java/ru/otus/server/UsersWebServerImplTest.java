@@ -47,7 +47,7 @@ class UsersWebServerImplTest extends WebServersTestBase {
         given(userDao.findById(DEFAULT_USER_ID)).willReturn(Optional.of(DEFAULT_USER));
 
         gson = new GsonBuilder().serializeNulls().create();
-        webServer = new UsersWebServerImpl(WEB_SERVER_PORT, userAuthService, userDao, gson, templateProcessor);
+        webServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.FILTER_BASED, userAuthService, userDao, gson, templateProcessor);
         webServer.start();
     }
 
