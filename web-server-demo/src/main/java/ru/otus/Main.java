@@ -22,7 +22,10 @@ public class Main {
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
 
-        UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.BASIC, userAuthService, userDao, gson, templateProcessor);
+        UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.FILTER_BASED, userAuthService, userDao, gson, templateProcessor);
+        //UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.BASIC, userAuthService, userDao, gson, templateProcessor);
+        //UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.BASIC_CUSTOM, userAuthService, userDao, gson, templateProcessor);
+        //UsersWebServer usersWebServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.NONE, userAuthService, userDao, gson, templateProcessor);
 
         usersWebServer.start();
         usersWebServer.join();

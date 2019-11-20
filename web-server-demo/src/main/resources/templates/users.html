@@ -6,7 +6,8 @@
             const userIdTextBox = document.getElementById('userIdTextBox');
             const userDataContainer = document.getElementById('userDataContainer');
             const id = userIdTextBox.value;
-            fetch('api/user?id=' + id)
+            //fetch('api/user?id=' + id)
+            fetch('api/user/' + id)
                 .then(response => response.json())
                 .then(user => userDataContainer.innerHTML = JSON.stringify(user));
         }
@@ -38,33 +39,5 @@
         </tr>
     </tbody>
 </table>
-
-<h4>Список пользователей</h4>
-<table style="width: 400px">
-    <thead>
-        <tr>
-            <td style="width: 50px">Id</td>
-            <td style="width: 150px">Имя</td>
-            <td style="width: 100px">Логин</td>
-            <td style="width: 100px">Пароль</td>
-        </tr>
-    </thead>
-
-    <tbody>
-    <#list users as u>
-        <tr>
-            <td>${u.id}</td>
-            <td>${u.name}</td>
-            <td>${u.login}</td>
-            <td>${u.password}</td>
-        </tr>
-    <#else>
-        <tr>
-            <td colspan="3">Пользователей не найдено</td>
-        </tr>
-    </#list>
-    </tbody>
-</table>
-
 </body>
 </html>

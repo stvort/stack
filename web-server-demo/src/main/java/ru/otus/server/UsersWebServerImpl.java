@@ -1,12 +1,8 @@
 package ru.otus.server;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.*;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -15,20 +11,19 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.security.Constraint;
 import ru.otus.dao.UserDao;
+import ru.otus.services.InMemoryLoginServiceImpl;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.UserAuthService;
 import ru.otus.servlet.AuthorizationFilter;
 import ru.otus.servlet.LoginServlet;
 import ru.otus.servlet.UsersApiServlet;
-import ru.otus.servlet.UsersPageServlet;
+import ru.otus.servlet.UsersServlet;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -74,11 +69,12 @@ public class UsersWebServerImpl implements UsersWebServer {
     private Server initContext() {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
-        context.addServlet(new ServletHolder(new UsersPageServlet(templateProcessor, userDao)), "/users");
-        context.addServlet(new ServletHolder(new UsersApiServlet(userDao, gson)), "/api/user");
-        context.addServlet(new ServletHolder(new LoginServlet(userAuthService)), "/api/login");
+        context.addServlet(new ServletHolder(new UsersServlet(templateProcessor, userDao)), "/users");
+        context.addServlet(new ServletHolder(new UsersApiServlet(userDao, gson)), "/api/user/*");
 
         if (securityType == SecurityType.FILTER_BASED) {
+            //context.addServlet(new ServletHolder(new LoginServlet(templateProcessor, userAuthService)), "/login");
+            context.addServlet(new ServletHolder(new LoginServlet(templateProcessor, userAuthService)), "/login");
             context.addFilter(new FilterHolder(new AuthorizationFilter()), "/users", null);
             context.addFilter(new FilterHolder(new AuthorizationFilter()), "/api/user", null);
         }
@@ -88,8 +84,8 @@ public class UsersWebServerImpl implements UsersWebServer {
         HandlerList handlers = new HandlerList();
         handlers.addHandler(createResourceHandler());
 
-        if (securityType == SecurityType.BASIC) {
-            handlers.addHandler(createSecurityHandler(context, "/users", "/api/user"));
+        if (securityType == SecurityType.BASIC || securityType == SecurityType.BASIC_CUSTOM) {
+            handlers.addHandler(createSecurityHandler(context, "/users", "/api/user/*"));
         }
         handlers.addHandler(context);
 
@@ -128,6 +124,15 @@ public class UsersWebServerImpl implements UsersWebServer {
         //как декодировать стороку с юзером:паролем https://www.base64decode.org/
         security.setAuthenticator(new BasicAuthenticator());
 
+        LoginService loginService = securityType == SecurityType.BASIC? createHashLoginService() : createInMemoryLoginService();
+        security.setLoginService(loginService);
+        security.setHandler(new HandlerList(context));
+        security.setConstraintMappings(constraintMappings);
+
+        return security;
+    }
+
+    private LoginService createHashLoginService() {
         String configLocation = null;
         File realmFile = new File("./realm.properties");
         if (realmFile.exists()) {
@@ -140,11 +145,10 @@ public class UsersWebServerImpl implements UsersWebServer {
                     .orElseThrow(() -> new RuntimeException("Realm property file not found")).getPath();
 
         }
+        return new HashLoginService("AnyRealm", URLDecoder.decode(configLocation, StandardCharsets.UTF_8));
+    }
 
-        security.setLoginService(new HashLoginService("AnyRealm", URLDecoder.decode(configLocation)));
-        security.setHandler(new HandlerList(context));
-        security.setConstraintMappings(constraintMappings);
-
-        return security;
+    private LoginService createInMemoryLoginService() {
+        return new InMemoryLoginServiceImpl(userDao);
     }
 }

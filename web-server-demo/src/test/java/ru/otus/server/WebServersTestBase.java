@@ -56,14 +56,11 @@ class WebServersTestBase {
         return response.toString();
     }
 
-    String buildUrl(String host, String path, Map<String, String> params) {
+    String buildUrl(String host, String path, List<String> pathParams) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(host);
         stringBuilder.append(path);
-        Optional.ofNullable(params).ifPresent(paramsMap -> {
-            stringBuilder.append("?");
-            paramsMap.entrySet().forEach(e -> stringBuilder.append(e.getKey()).append("=").append(e.getValue()));
-        });
+        Optional.ofNullable(pathParams).ifPresent(paramsMap -> paramsMap.forEach(p -> stringBuilder.append("/").append(p)));
         return stringBuilder.toString();
     }
 

@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-import static javax.servlet.http.HttpServletResponse.*;
-
 public class AuthorizationFilter implements Filter {
 
     private ServletContext context;
@@ -27,16 +25,16 @@ public class AuthorizationFilter implements Filter {
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        HttpServletResponse res = (HttpServletResponse) servletResponse;
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String uri = req.getRequestURI();
+        String uri = request.getRequestURI();
         this.context.log("Requested Resource:" + uri);
 
-        HttpSession session = req.getSession(false);
+        HttpSession session = request.getSession(false);
 
         if (session == null) {
-            res.setStatus(SC_FORBIDDEN);
+            response.sendRedirect("/login");
         } else {
             filterChain.doFilter(servletRequest, servletResponse);
         }

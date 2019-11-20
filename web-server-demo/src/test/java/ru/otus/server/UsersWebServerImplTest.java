@@ -11,6 +11,7 @@ import ru.otus.services.UserAuthService;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ class UsersWebServerImplTest extends WebServersTestBase {
 
     private static final int WEB_SERVER_PORT = 8989;
     private static final String WEB_SERVER_URL = "http://localhost:" + WEB_SERVER_PORT + "/";
-    private static final String API_LOGIN_URL = "api/login";
+    private static final String LOGIN_URL = "login";
     private static final String API_USER_URL = "api/user";
     private static final String USER_ID_PARAM_NAME = "id";
 
@@ -56,48 +57,38 @@ class UsersWebServerImplTest extends WebServersTestBase {
         webServer.stop();
     }
 
-    @DisplayName("возвращать 403 при запросе пользователя по id если не выполнен вход ")
+    @DisplayName("возвращать 302 при запросе пользователя по id если не выполнен вход ")
     @Test
     void shouldReturnForbiddenStatusForUserRequestWhenUnauthorized() throws Exception {
         HttpURLConnection connection = sendRequest(buildUrl(WEB_SERVER_URL, API_USER_URL, null), HttpMethod.GET);
-        int responseCode;
-        try {
-            responseCode = connection.getResponseCode();
-        } finally {
-            connection.disconnect();
-        }
-        assertThat(responseCode).isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
+        connection.setInstanceFollowRedirects(false);
+        int responseCode = connection.getResponseCode();
+        assertThat(responseCode).isEqualTo(HttpURLConnection.HTTP_MOVED_TEMP);
     }
 
     @DisplayName("возвращать ID сессии при выполнении входа с верными данными")
     @Test
     void shouldReturnJSessionIdWhenLoggingInWithCorrectData() throws Exception {
-        HttpCookie jSessionIdCookie = login(buildUrl(WEB_SERVER_URL, API_LOGIN_URL, null), DEFAULT_USER_LOGIN, DEFAULT_USER_PASSWORD);
+        HttpCookie jSessionIdCookie = login(buildUrl(WEB_SERVER_URL, LOGIN_URL, null), DEFAULT_USER_LOGIN, DEFAULT_USER_PASSWORD);
         assertThat(jSessionIdCookie).isNotNull();
     }
 
     @DisplayName("не возвращать ID сессии при выполнении входа если данные входа не верны")
     @Test
     void shouldNotReturnJSessionIdWhenLoggingInWithIncorrectData() throws Exception {
-        HttpCookie jSessionIdCookie = login(buildUrl(WEB_SERVER_URL, API_LOGIN_URL, null), INCORRECT_USER_LOGIN, DEFAULT_USER_PASSWORD);
+        HttpCookie jSessionIdCookie = login(buildUrl(WEB_SERVER_URL, LOGIN_URL, null), INCORRECT_USER_LOGIN, DEFAULT_USER_PASSWORD);
         assertThat(jSessionIdCookie).isNull();
     }
 
     @DisplayName("возвращать корректные данные при запросе пользователя по id если вход выполнен")
     @Test
     void shouldReturnCorrectUserWhenAuthorized() throws IOException {
-        HttpCookie jSessionIdCookie = login(buildUrl(WEB_SERVER_URL, API_LOGIN_URL, null), DEFAULT_USER_LOGIN, DEFAULT_USER_PASSWORD);
+        HttpCookie jSessionIdCookie = login(buildUrl(WEB_SERVER_URL, LOGIN_URL, null), DEFAULT_USER_LOGIN, DEFAULT_USER_PASSWORD);
 
-        String response;
-        int responseCode;
-        HttpURLConnection connection = sendRequest(buildUrl(WEB_SERVER_URL, API_USER_URL, Map.of(USER_ID_PARAM_NAME, String.valueOf(DEFAULT_USER_ID))), HttpMethod.GET);
-        try {
-            connection.setRequestProperty(COOKIE_HEADER, String.format("%s=%s", jSessionIdCookie.getName(), jSessionIdCookie.getValue()));
-            responseCode = connection.getResponseCode();
-            response = readResponseFromConnection(connection);
-        } finally {
-            connection.disconnect();
-        }
+        HttpURLConnection connection = sendRequest(buildUrl(WEB_SERVER_URL, API_USER_URL, List.of(String.valueOf(DEFAULT_USER_ID))), HttpMethod.GET);
+        connection.setRequestProperty(COOKIE_HEADER, String.format("%s=%s", jSessionIdCookie.getName(), jSessionIdCookie.getValue()));
+        int responseCode = connection.getResponseCode();
+        String response = readResponseFromConnection(connection);
 
         assertThat(responseCode).isEqualTo(HttpURLConnection.HTTP_OK);
         assertThat(response).isEqualTo(gson.toJson(DEFAULT_USER));

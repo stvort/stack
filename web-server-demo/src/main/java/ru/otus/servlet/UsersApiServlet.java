@@ -13,8 +13,8 @@ import java.io.IOException;
 
 public class UsersApiServlet extends HttpServlet {
 
-    private static final String CONTENT_TYPE_APPLICATION_JSON = "application/json;charset=UTF-8";
-    private static final String PARAM_ID = "id";
+    private static final int ID_PATH_PARAM_POSITION = 1;
+
     private final UserDao userDao;
     private final Gson gson;
 
@@ -24,13 +24,18 @@ public class UsersApiServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String id = req.getParameter(PARAM_ID);
-        User user = userDao.findById(Long.parseLong(id)).orElse(null);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        User user = userDao.findById(extractIdFromRequest(request)).orElse(null);
 
-        resp.setContentType(CONTENT_TYPE_APPLICATION_JSON);
-        ServletOutputStream out = resp.getOutputStream();
+        response.setContentType("application/json;charset=UTF-8");
+        ServletOutputStream out = response.getOutputStream();
         out.print(gson.toJson(user));
+    }
+
+    private long extractIdFromRequest(HttpServletRequest request) {
+        String[] path = request.getPathInfo().split("/");
+        String id = (path.length > 1)? path[ID_PATH_PARAM_POSITION]: String.valueOf(- 1);
+        return Long.parseLong(id);
     }
 
 }
