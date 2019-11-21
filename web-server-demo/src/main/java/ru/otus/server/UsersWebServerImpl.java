@@ -3,6 +3,7 @@ package ru.otus.server;
 import com.google.gson.Gson;
 import org.eclipse.jetty.security.*;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
@@ -11,7 +12,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.security.Constraint;
 import ru.otus.dao.UserDao;
-import ru.otus.services.InMemoryLoginServiceImpl;
+import ru.otus.helpers.FileSystemHelper;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.UserAuthService;
 import ru.otus.servlet.AuthorizationFilter;
@@ -19,32 +20,35 @@ import ru.otus.servlet.LoginServlet;
 import ru.otus.servlet.UsersApiServlet;
 import ru.otus.servlet.UsersServlet;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class UsersWebServerImpl implements UsersWebServer {
+    private static final String START_PAGE_NAME = "index.html";
+    private static final String COMMON_RESOURCES_DIR = "static";
+    private static final String ROLE_NAME_USER = "user";
+    private static final String ROLE_NAME_ADMIN = "admin";
+    private static final String CONSTRAINT_NAME = "auth";
+
     private final int port;
-    private final UserAuthService userAuthService;
+    private final SecurityType securityType;
+    private final UserAuthService userAuthServiceForFilterBasedSecurity;
+    private final LoginService loginServiceForBasicSecurity;
     private final UserDao userDao;
     private final Gson gson;
     private final TemplateProcessor templateProcessor;
-    private final SecurityType securityType;
     private final Server server;
 
     public UsersWebServerImpl(int port, SecurityType securityType,
-                              UserAuthService userAuthService,
-                              UserDao userDao,
+                              UserAuthService userAuthServiceForFilterBasedSecurity,
+                              LoginService loginServiceForBasicSecurity, UserDao userDao,
                               Gson gson,
                               TemplateProcessor templateProcessor) {
         this.port = port;
         this.securityType = securityType;
-        this.userAuthService = userAuthService;
+        this.userAuthServiceForFilterBasedSecurity = userAuthServiceForFilterBasedSecurity;
+        this.loginServiceForBasicSecurity = loginServiceForBasicSecurity;
         this.userDao = userDao;
         this.gson = gson;
         this.templateProcessor = templateProcessor;
@@ -67,28 +71,15 @@ public class UsersWebServerImpl implements UsersWebServer {
     }
 
     private Server initContext() {
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        HandlerList handlers = new HandlerList();
 
-        context.addServlet(new ServletHolder(new UsersServlet(templateProcessor, userDao)), "/users");
-        context.addServlet(new ServletHolder(new UsersApiServlet(userDao, gson)), "/api/user/*");
+        ResourceHandler resourceHandler = createResourceHandler();
+        handlers.addHandler(resourceHandler);
 
-        if (securityType == SecurityType.FILTER_BASED) {
-            //context.addServlet(new ServletHolder(new LoginServlet(templateProcessor, userAuthService)), "/login");
-            context.addServlet(new ServletHolder(new LoginServlet(templateProcessor, userAuthService)), "/login");
-            context.addFilter(new FilterHolder(new AuthorizationFilter()), "/users", null);
-            context.addFilter(new FilterHolder(new AuthorizationFilter()), "/api/user", null);
-        }
+        ServletContextHandler servletContextHandler = createServletContextHandler();
+        handlers.addHandler(applySecurity(servletContextHandler));
 
         Server server = new Server(port);
-
-        HandlerList handlers = new HandlerList();
-        handlers.addHandler(createResourceHandler());
-
-        if (securityType == SecurityType.BASIC || securityType == SecurityType.BASIC_CUSTOM) {
-            handlers.addHandler(createSecurityHandler(context, "/users", "/api/user/*"));
-        }
-        handlers.addHandler(context);
-
         server.setHandler(handlers);
         return server;
     }
@@ -96,21 +87,41 @@ public class UsersWebServerImpl implements UsersWebServer {
     private ResourceHandler createResourceHandler() {
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(false);
-        resourceHandler.setWelcomeFiles(new String[]{"index.html"});
-
-        URL fileDir = UsersWebServerImpl.class.getClassLoader().getResource("static");
-        if (fileDir == null) {
-            throw new RuntimeException("File Directory not found");
-        }
-        resourceHandler.setResourceBase(URLDecoder.decode(fileDir.getPath(), StandardCharsets.UTF_8));
+        resourceHandler.setWelcomeFiles(new String[]{START_PAGE_NAME});
+        resourceHandler.setResourceBase(FileSystemHelper.localFileNameOrResourceNameToFullPath(COMMON_RESOURCES_DIR));
         return resourceHandler;
     }
 
-    private SecurityHandler createSecurityHandler(ServletContextHandler context, String ...paths) {
+    private ServletContextHandler createServletContextHandler() {
+        ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        servletContextHandler.addServlet(new ServletHolder(new UsersServlet(templateProcessor, userDao)), "/users");
+        servletContextHandler.addServlet(new ServletHolder(new UsersApiServlet(userDao, gson)), "/api/user/*");
+        return servletContextHandler;
+    }
+
+    private Handler applySecurity(ServletContextHandler servletContextHandler) {
+        if (securityType == SecurityType.FILTER_BASED) {
+            applyFilterBasedSecurity(servletContextHandler, "/users", "/api/user/*");
+            return servletContextHandler;
+        } else if (securityType == SecurityType.BASIC) {
+            return createBasicAuthSecurityHandler(servletContextHandler, "/users", "/api/user/*");
+        }
+        return servletContextHandler;
+    }
+
+    private ServletContextHandler applyFilterBasedSecurity(ServletContextHandler servletContextHandler, String... paths) {
+        servletContextHandler.addServlet(new ServletHolder(new LoginServlet(templateProcessor, userAuthServiceForFilterBasedSecurity)), "/login");
+        AuthorizationFilter authorizationFilter = new AuthorizationFilter();
+        IntStream.range(0, paths.length)
+                .forEachOrdered(i -> servletContextHandler.addFilter(new FilterHolder(authorizationFilter), paths[i], null));
+        return servletContextHandler;
+    }
+
+    private SecurityHandler createBasicAuthSecurityHandler(ServletContextHandler context, String... paths) {
         Constraint constraint = new Constraint();
-        constraint.setName("auth");
+        constraint.setName(CONSTRAINT_NAME);
         constraint.setAuthenticate(true);
-        constraint.setRoles(new String[]{"user", "admin"});
+        constraint.setRoles(new String[]{ROLE_NAME_USER, ROLE_NAME_ADMIN});
 
         List<ConstraintMapping> constraintMappings = new ArrayList<>();
         IntStream.range(0, paths.length).forEachOrdered(i -> {
@@ -124,31 +135,11 @@ public class UsersWebServerImpl implements UsersWebServer {
         //как декодировать стороку с юзером:паролем https://www.base64decode.org/
         security.setAuthenticator(new BasicAuthenticator());
 
-        LoginService loginService = securityType == SecurityType.BASIC? createHashLoginService() : createInMemoryLoginService();
-        security.setLoginService(loginService);
-        security.setHandler(new HandlerList(context));
+        security.setLoginService(loginServiceForBasicSecurity);
         security.setConstraintMappings(constraintMappings);
+        security.setHandler(new HandlerList(context));
 
         return security;
     }
 
-    private LoginService createHashLoginService() {
-        String configLocation = null;
-        File realmFile = new File("./realm.properties");
-        if (realmFile.exists()) {
-            configLocation = realmFile.toURI().getPath();
-        }
-
-        if (configLocation == null) {
-            System.out.println("local realm config not found, looking into Resources");
-            configLocation = Optional.ofNullable(UsersWebServerImpl.class.getClassLoader().getResource("realm.properties"))
-                    .orElseThrow(() -> new RuntimeException("Realm property file not found")).getPath();
-
-        }
-        return new HashLoginService("AnyRealm", URLDecoder.decode(configLocation, StandardCharsets.UTF_8));
-    }
-
-    private LoginService createInMemoryLoginService() {
-        return new InMemoryLoginServiceImpl(userDao);
-    }
 }

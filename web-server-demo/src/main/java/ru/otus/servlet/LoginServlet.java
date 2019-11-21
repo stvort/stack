@@ -20,7 +20,6 @@ public class LoginServlet extends HttpServlet {
     private static final String PARAM_PASSWORD = "password";
     private static final int MAX_INACTIVE_INTERVAL = 30;
     private static final String LOGIN_PAGE_TEMPLATE = "login.html";
-    private static final String PAGE_USERS = "/users";
 
 
     private final TemplateProcessor templateProcessor;
@@ -46,7 +45,7 @@ public class LoginServlet extends HttpServlet {
         if (userAuthService.authenticate(name, password)) {
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(MAX_INACTIVE_INTERVAL);
-            response.sendRedirect(PAGE_USERS);
+            response.sendRedirect("/users");
         } else {
             response.setStatus(SC_UNAUTHORIZED);
         }

@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 class WebServersTestBase {

@@ -12,12 +12,12 @@ import ru.otus.services.UserAuthService;
 import java.io.IOException;
 import java.net.*;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static ru.otus.server.SecurityType.*;
 
 @DisplayName("Тест сервера должен ")
 class UsersWebServerImplTest extends WebServersTestBase {
@@ -26,7 +26,6 @@ class UsersWebServerImplTest extends WebServersTestBase {
     private static final String WEB_SERVER_URL = "http://localhost:" + WEB_SERVER_PORT + "/";
     private static final String LOGIN_URL = "login";
     private static final String API_USER_URL = "api/user";
-    private static final String USER_ID_PARAM_NAME = "id";
 
     private static final long DEFAULT_USER_ID = 1L;
     private static final String DEFAULT_USER_LOGIN = "user1";
@@ -48,7 +47,7 @@ class UsersWebServerImplTest extends WebServersTestBase {
         given(userDao.findById(DEFAULT_USER_ID)).willReturn(Optional.of(DEFAULT_USER));
 
         gson = new GsonBuilder().serializeNulls().create();
-        webServer = new UsersWebServerImpl(WEB_SERVER_PORT, SecurityType.FILTER_BASED, userAuthService, userDao, gson, templateProcessor);
+        webServer = new UsersWebServerImpl(WEB_SERVER_PORT, FILTER_BASED, userAuthService, null, userDao, gson, templateProcessor);
         webServer.start();
     }
 
