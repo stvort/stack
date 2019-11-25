@@ -18,9 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static ru.otus.server.SecurityType.*;
+import static ru.otus.server.utils.HttpUrlConnectionHelper.*;
+import static ru.otus.server.utils.WebServerHelper.*;
 
 @DisplayName("Тест сервера должен ")
-class UsersWebServerImplTest extends WebServersTestBase {
+class UsersWebServerImplTest {
 
     private static final int WEB_SERVER_PORT = 8989;
     private static final String WEB_SERVER_URL = "http://localhost:" + WEB_SERVER_PORT + "/";

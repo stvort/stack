@@ -79,9 +79,9 @@ public class UsersWebServerImpl implements UsersWebServer {
         ServletContextHandler servletContextHandler = createServletContextHandler();
         handlers.addHandler(applySecurity(servletContextHandler));
 
-        Server server = new Server(port);
-        server.setHandler(handlers);
-        return server;
+        Server srv = new Server(port);
+        srv.setHandler(handlers);
+        return srv;
     }
 
     private ResourceHandler createResourceHandler() {
@@ -100,13 +100,16 @@ public class UsersWebServerImpl implements UsersWebServer {
     }
 
     private Handler applySecurity(ServletContextHandler servletContextHandler) {
-        if (securityType == SecurityType.FILTER_BASED) {
+        if (securityType == SecurityType.NONE){
+            return servletContextHandler;
+        } else if (securityType == SecurityType.FILTER_BASED) {
             applyFilterBasedSecurity(servletContextHandler, "/users", "/api/user/*");
             return servletContextHandler;
         } else if (securityType == SecurityType.BASIC) {
             return createBasicAuthSecurityHandler(servletContextHandler, "/users", "/api/user/*");
+        } else {
+            throw new InvalidSecurityTypeException(securityType);
         }
-        return servletContextHandler;
     }
 
     private ServletContextHandler applyFilterBasedSecurity(ServletContextHandler servletContextHandler, String... paths) {
