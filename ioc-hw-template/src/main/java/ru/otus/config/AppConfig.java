@@ -10,11 +10,6 @@ import java.util.Scanner;
 @AppComponentsContainerConfig(order = 1)
 public class AppConfig {
 
-    @AppComponent(order = 0, name = "ioService")
-    public IOService ioService() {
-        return new IOServiceConsole(System.out, new Scanner(System.in));
-    }
-
     @AppComponent(order = 0, name = "equationPreparer")
     public EquationPreparer equationPreparer(){
         return new EquationPreparerImpl();
@@ -30,6 +25,11 @@ public class AppConfig {
                                        PlayerService playerService,
                                        EquationPreparer equationPreparer) {
         return new GameProcessorImpl(ioService, equationPreparer, playerService);
+    }
+
+    @AppComponent(order = 0, name = "ioService")
+    public IOService ioService() {
+        return new IOServiceConsole(System.out, new Scanner(System.in));
     }
 
 }
