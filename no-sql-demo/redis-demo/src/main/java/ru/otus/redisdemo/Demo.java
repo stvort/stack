@@ -1,11 +1,11 @@
-package ru.otus.mongodemo;
+package ru.otus.redisdemo;
 
 import com.google.gson.Gson;
 import lombok.val;
 import redis.clients.jedis.Jedis;
-import ru.otus.mongodemo.model.Phone;
-import ru.otus.mongodemo.model.SmartPhone;
-import ru.otus.mongodemo.template.RedisTemplateImpl;
+import ru.otus.redisdemo.model.Phone;
+import ru.otus.redisdemo.model.SmartPhone;
+import ru.otus.redisdemo.template.RedisTemplateImpl;
 
 import java.util.Objects;
 import java.util.UUID;

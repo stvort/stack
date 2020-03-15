@@ -1,4 +1,4 @@
-package ru.otus.mongodemo.model;
+package ru.otus.redisdemo.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

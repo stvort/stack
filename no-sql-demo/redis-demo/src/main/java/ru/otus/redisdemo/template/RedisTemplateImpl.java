@@ -1,4 +1,4 @@
-package ru.otus.mongodemo.template;
+package ru.otus.redisdemo.template;
 
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;

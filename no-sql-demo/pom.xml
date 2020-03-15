@@ -14,5 +14,6 @@
         <module>mongo-db-demo</module>
         <module>mongo-db-reactive-demo</module>
         <module>redis-demo</module>
+        <module>cassandra-demo</module>
     </modules>
 </project>

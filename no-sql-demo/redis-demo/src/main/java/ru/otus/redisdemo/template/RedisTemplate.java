@@ -1,4 +1,4 @@
-package ru.otus.mongodemo.template;
+package ru.otus.redisdemo.template;
 
 import java.util.List;
 import java.util.Optional;

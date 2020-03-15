@@ -1,4 +1,4 @@
-package ru.otus.mongodemo;
+package ru.otus.redisdemo;
 
 import lombok.val;
 import org.slf4j.Logger;
