@@ -1,4 +1,4 @@
-package ru.otus.cassandrademo.template;
+package ru.otus.cassandrademo.db;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;

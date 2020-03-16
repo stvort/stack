@@ -13,13 +13,16 @@ import java.util.stream.Collectors;
 
 
 public class Demo {
+    private static final int REDIS_PORT = 6379;
+    private static final String REDIS_HOST = "192.168.99.100";
+
     public static void main(String[] args) throws Throwable {
         val motorolaC350 = new Phone(UUID.randomUUID().toString(), "C350", "silver", "000001");
         val motorolaZ800i = new Phone(UUID.randomUUID().toString(), "Z800i", "silver", "000002");
         val huaweiP20 = new SmartPhone(UUID.randomUUID().toString(),"p20", "black", "000003", "Android");
 
         val mapper = new Gson();
-        val jedis = new Jedis();
+        val jedis = new Jedis(REDIS_HOST, REDIS_PORT);
         val redisTemplate = new RedisTemplateImpl(jedis, mapper);
 
         jedis.flushAll();

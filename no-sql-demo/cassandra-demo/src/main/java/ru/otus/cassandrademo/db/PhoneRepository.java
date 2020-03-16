@@ -1,4 +1,4 @@
-package ru.otus.cassandrademo.template;
+package ru.otus.cassandrademo.db;
 
 import java.util.List;
 import java.util.Optional;

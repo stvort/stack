@@ -15,9 +15,12 @@ public class DemoPublishSubscribe {
     private static final Logger logger = LoggerFactory.getLogger(DemoPublishSubscribe.class);
     private static final String MESSAGE_QUEUE_CHANNEL_NAME = "message-queue";
 
+    private static final int REDIS_PORT = 6379;
+    private static final String REDIS_HOST = "192.168.99.100";
+
     public static void main(String[] args) throws Throwable {
-        val publisher = new Jedis();
-        val subscriber = new Jedis();
+        val publisher = new Jedis(REDIS_HOST, REDIS_PORT);
+        val subscriber = new Jedis(REDIS_HOST, REDIS_PORT);
 
         val latch = new CountDownLatch(5);
         val executorService = Executors.newScheduledThreadPool(1);

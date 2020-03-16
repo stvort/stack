@@ -2,7 +2,7 @@ package ru.otus.cassandrademo.schema;
 
 import com.datastax.driver.core.Session;
 import lombok.RequiredArgsConstructor;
-import ru.otus.cassandrademo.template.CassandraConnection;
+import ru.otus.cassandrademo.db.CassandraConnection;
 
 @RequiredArgsConstructor
 public class CassandraPhonesSchemaInitializer implements CassandraSchemaInitializer {

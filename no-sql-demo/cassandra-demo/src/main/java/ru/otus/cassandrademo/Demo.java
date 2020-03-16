@@ -7,10 +7,11 @@ import ru.otus.cassandrademo.model.Phone;
 import ru.otus.cassandrademo.model.SmartPhone;
 import ru.otus.cassandrademo.schema.CassandraPhonesSchemaInitializer;
 import ru.otus.cassandrademo.schema.CassandraSchemaInitializer;
-import ru.otus.cassandrademo.template.CassandraConnection;
-import ru.otus.cassandrademo.template.PhoneRepository;
-import ru.otus.cassandrademo.template.PhoneRepositoryImpl;
+import ru.otus.cassandrademo.db.CassandraConnection;
+import ru.otus.cassandrademo.db.PhoneRepository;
+import ru.otus.cassandrademo.db.PhoneRepositoryImpl;
 
+import java.util.List;
 import java.util.UUID;
 
 import static ru.otus.cassandrademo.schema.CassandraPhonesSchemaInitializer.FULL_PHONES_TABLE_NAME;
@@ -38,8 +39,13 @@ public class Demo {
             repository.insert(motorolaZ800i, Phone.class);
             repository.insert(huaweiP20, SmartPhone.class);
 
+            List<Phone> all = repository.findAll(Phone.class);
+            System.out.println(all);
+
+/*
             ResultSet resultSet = session.execute("SELECT * FROM " + FULL_PHONES_TABLE_NAME);
             resultSet.all().forEach(System.out::println);
+*/
 
         }
     }
