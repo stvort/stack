@@ -8,8 +8,8 @@ public class CassandraConnection implements AutoCloseable {
     private Cluster cluster;
     private Session session;
 
-    public CassandraConnection(String node, int port) {
-        cluster = Cluster.builder().addContactPoint(node).withPort(port).build();
+    public CassandraConnection(String nodeAddress, int port) {
+        cluster = Cluster.builder().addContactPoint(nodeAddress).withPort(port).build();
         session = cluster.connect();
     }
 

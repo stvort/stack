@@ -51,12 +51,14 @@ public class Demo {
       System.out.println("\n");
 
       val allSilverPhones = mongoTemplate.find(eq("color", "silver"), Phone.class);
-      System.out.println("All sliver phones from db:\n" + allSilverPhones.stream().map(Objects::toString).collect(Collectors.joining("\n")));
+      System.out.println("All sliver phones from db:\n" + allSilverPhones.stream()
+              .map(Objects::toString).collect(Collectors.joining("\n")));
 
       System.out.println();
 
       val allPhones = mongoTemplate.findAll(Phone.class);
-      System.out.println("All phones from db:\n" + allPhones.stream().map(Objects::toString).collect(Collectors.joining("\n")));
+      System.out.println("All phones from db:\n" + allPhones.stream()
+              .map(Objects::toString).collect(Collectors.joining("\n")));
 
       System.out.println();
     }

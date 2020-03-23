@@ -31,13 +31,13 @@ public class MongoTemplateImpl implements MongoTemplate {
     }
 
     @Override
-    public <T> Optional<T> findOne(Bson query, Class<T> tClass) throws Exception {
+    public <T> Optional<T> findOne(Bson query, Class<T> tClass) {
         val document = collection.find(query).first();
         return Optional.ofNullable(document).map(d -> document2Object(d, tClass));
     }
 
     @Override
-    public <T> List<T> find(Bson query, Class<T> tClass) throws Exception {
+    public <T> List<T> find(Bson query, Class<T> tClass) {
         val documents = collection.find(query);
 
         val res = new ArrayList<T>();
@@ -54,10 +54,11 @@ public class MongoTemplateImpl implements MongoTemplate {
         return find(Document.parse("{}"), tClass);
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     private <T> T document2Object(Document document, Class<T> tClass) {
         if (tClass.equals(Document.class)) {
-            return (T)document;
+            return (T) document;
         }
 
         val id = document.get("_id");

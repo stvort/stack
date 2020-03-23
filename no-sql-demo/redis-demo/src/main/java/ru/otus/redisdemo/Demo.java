@@ -45,7 +45,6 @@ public class Demo {
         val huaweiP20Optional = redisTemplate.findOne(huaweiP20.getId(), SmartPhone.class);
         huaweiP20Optional.ifPresent(sm -> System.out.printf("Smartphone from db is:\n%s", sm));
 
-
         System.out.println("\n");
 
         val allPhones = redisTemplate.findAll(Phone.class);

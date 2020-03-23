@@ -1,6 +1,5 @@
 package ru.otus.cassandrademo;
 
-import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import lombok.val;
 import ru.otus.cassandrademo.model.Phone;
@@ -11,11 +10,9 @@ import ru.otus.cassandrademo.db.CassandraConnection;
 import ru.otus.cassandrademo.db.PhoneRepository;
 import ru.otus.cassandrademo.db.PhoneRepositoryImpl;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-
-import static ru.otus.cassandrademo.schema.CassandraPhonesSchemaInitializer.FULL_PHONES_TABLE_NAME;
-
+import java.util.stream.Collectors;
 
 public class Demo {
 
@@ -23,30 +20,48 @@ public class Demo {
     private static final String CASSANDRA_HOST = "192.168.99.100";
 
     public static void main(String[] args) throws Throwable {
-        val motorolaC350 = new Phone(UUID.randomUUID(), "C350", "silver", "000001");
-        val motorolaZ800i = new Phone(UUID.randomUUID(), "Z800i", "silver", "000002");
-        val huaweiP20 = new SmartPhone(UUID.randomUUID(),"p20", "black", "000003", "Android");
+        val motorolaC350 = new Phone(UUID.randomUUID(), "C350",
+                "silver", "000001");
+        val motorolaZ800i = new Phone(UUID.randomUUID(), "Z800i",
+                "silver", "000002");
+        val huaweiP20 = new SmartPhone(UUID.randomUUID(),"p20",
+                "black", "000003", "Android");
 
-        try (CassandraConnection connector = new CassandraConnection(CASSANDRA_HOST, CASSANDRA_PORT)) {
-            CassandraSchemaInitializer initializer = new CassandraPhonesSchemaInitializer(connector);
-            PhoneRepository repository = new PhoneRepositoryImpl(connector);
+        try (CassandraConnection connector = new CassandraConnection(CASSANDRA_HOST,
+                CASSANDRA_PORT)) {
+            val initializer = new CassandraPhonesSchemaInitializer(connector);
+            val repository = new PhoneRepositoryImpl(connector);
 
-            initializer.dropSchemaifExists();
+            initializer.dropSchemaIfExists();
             initializer.initSchema();
 
-            Session session = connector.getSession();
             repository.insert(motorolaC350, Phone.class);
             repository.insert(motorolaZ800i, Phone.class);
             repository.insert(huaweiP20, SmartPhone.class);
 
-            List<Phone> all = repository.findAll(Phone.class);
-            System.out.println(all);
+            System.out.println("\n");
 
-/*
-            ResultSet resultSet = session.execute("SELECT * FROM " + FULL_PHONES_TABLE_NAME);
-            resultSet.all().forEach(System.out::println);
-*/
+            val motorolaC350Optional = repository.findOne(motorolaC350.getId(), Phone.class);
+            motorolaC350Optional.ifPresent(sm ->
+                    System.out.printf("Phone from db is:\n%s", sm));
 
+            System.out.println("\n");
+
+            val motorolaZ800iOptional = repository.findOne(motorolaZ800i.getId(), Phone.class);
+            motorolaZ800iOptional.ifPresent(sm ->
+                    System.out.printf("Phone from db is:\n%s", sm));
+
+            System.out.println("\n");
+
+            val huaweiP20Optional = repository.findOne(huaweiP20.getId(), SmartPhone.class);
+            huaweiP20Optional.ifPresent(sm ->
+                    System.out.printf("Smartphone from db is:\n%s", sm));
+
+            System.out.println("\n");
+
+            val allPhones = repository.findAll(Phone.class);
+            System.out.println("All phones from db:\n" + allPhones.stream()
+                    .map(Objects::toString).collect(Collectors.joining("\n")));
         }
     }
 

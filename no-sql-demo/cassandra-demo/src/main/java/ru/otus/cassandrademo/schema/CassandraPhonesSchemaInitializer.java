@@ -6,13 +6,6 @@ import ru.otus.cassandrademo.db.CassandraConnection;
 
 @RequiredArgsConstructor
 public class CassandraPhonesSchemaInitializer implements CassandraSchemaInitializer {
-    private static final String SIMPLE_REPLICATION_STRATEGY = "SimpleStrategy";
-    private static final int REPLICATION_FACTOR = 1;
-
-    public static final String PRODUCTS_KEY_SPACE = "Products";
-    public static final String PHONES_TABLE = "Phones";
-    public static final String FULL_PHONES_TABLE_NAME = PRODUCTS_KEY_SPACE + "." + PHONES_TABLE;
-
     private final CassandraConnection cassandraConnection;
 
     @Override
@@ -23,23 +16,20 @@ public class CassandraPhonesSchemaInitializer implements CassandraSchemaInitiali
     }
 
     @Override
-    public void dropSchemaifExists() {
-        String query = "DROP KEYSPACE IF EXISTS " + PRODUCTS_KEY_SPACE;
+    public void dropSchemaIfExists() {
+        String query = "DROP KEYSPACE IF EXISTS Products";
         cassandraConnection.getSession().execute(query);
     }
 
     private void createKeySpace(Session session) {
-        String query = "CREATE KEYSPACE IF NOT EXISTS " +
-                PRODUCTS_KEY_SPACE + " WITH replication = {" +
-                "'class':'" + SIMPLE_REPLICATION_STRATEGY +
-                "','replication_factor':" + REPLICATION_FACTOR +
-                "};";
+        String query = "CREATE KEYSPACE IF NOT EXISTS Products" +
+                " WITH replication = {" +
+                "'class':'SimpleStrategy','replication_factor':1};";
         session.execute(query);
     }
 
     private void createTable(Session session) {
-        String query = "CREATE TABLE IF NOT EXISTS " +
-                FULL_PHONES_TABLE_NAME + "(" +
+        String query = "CREATE TABLE IF NOT EXISTS Products.Phones (" +
                 "id uuid PRIMARY KEY, " +
                 "model text," +
                 "color text," +
