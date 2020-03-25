@@ -1,20 +1,59 @@
 version: '3.5'
 services:
-   cassandra:
+  cassandra:
     image: cassandra:latest
     ports:
-     - "9042:9042"
-     - "7199:7199"
+      - "9042:9042"
+      - "7199:7199"
 
-   redis:
+  redis:
     image: redis:latest
     ports:
-     - "6379:6379"
- 
-   neo4j:
+      - "6379:6379"
+
+  neo4j:
     image: neo4j:latest
     ports:
       - "7474:7474"
-      - "7687:7687" 
+      - "7687:7687"
     environment:
       - NEO4J_AUTH=none
+
+
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
+    image: mongo:4.0-xenial
+    expose:
+      - 27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongo2:
+    hostname: mongo2
+    container_name: localmongo2
+    image: mongo:4.0-xenial
+    expose:
+      - 27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongo3:
+    hostname: mongo3
+    container_name: localmongo3
+    image: mongo:4.0-xenial
+    expose:
+      - 27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongosetup:
+    image: mongo:4.0-xenial
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - /droot/2020_03_27_NoSQL(JavaSE)/src/stack/no-sql-demo/scripts:/scripts
+    restart: "no"
+    entrypoint: [ "bash", "/scripts/mongo_setup.sh"]
