@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "sleeping for 10 seconds"
+echo "sleeping for 60 seconds"
 sleep 60
 
 echo mongo_setup.sh time now: `date +"%T" `

@@ -16,21 +16,22 @@ import java.util.concurrent.TimeUnit;
 
 public class Demo {
 
-    //public static final String MONGODB_URL = "mongodb://localhost";
-    //public static final String MONGODB_URL = "mongodb://192.168.99.100";
-    public static final String MONGODB_URL = "mongodb://root:example@192.168.99.100";
+    //public static final String MONGODB_URL = "mongodb://localhost"; // Работа без DockerToolbox
+    public static final String MONGODB_URL = "mongodb://192.168.99.100"; // Работа через DockerToolbox
+    private static final String DB_NAME = "mongo-db-test";
+    private static final String PRODUCTS_COLLECTION = "products";
 
     public static void main(String[] args) throws Throwable {
         try (MongoClient mongoClient = MongoClients.create(MONGODB_URL)) {
-            MongoDatabase database = mongoClient.getDatabase("test");
-            MongoCollection<Document> collection = database.getCollection("products");
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collection = database.getCollection(PRODUCTS_COLLECTION);
 
             System.out.println("\n");
 
             dropDatabase(database);
 
             //doInsertAndFindDemo(collection);
-            //writeAndRead(collection);
+            doWriteAndReadDemo(collection);
 
             System.out.println("\n");
         }
@@ -63,19 +64,19 @@ public class Demo {
         System.out.println(String.format("result.size: %d", results.size()));
     }
 
-    private static void writeAndRead(MongoCollection<Document> collection) throws Throwable {
-        writer(collection);
-        reader(collection);
+    private static void doWriteAndReadDemo(MongoCollection<Document> collection) throws Throwable {
+        subscribeForCollectionChanges(collection);
+        startWritingToCollectionInANewThread(collection);
     }
 
-    private static void writer(MongoCollection<Document> collection) {
-        Thread thread = new Thread(() -> {
+    private static void startWritingToCollectionInANewThread(MongoCollection<Document> collection) {
+        val thread = new Thread(() -> {
             try {
                 int counter = 0;
-                ObservableSubscriber<Success> subscriber = new ObservableSubscriber<>();
+                val subscriber = new ObservableSubscriber<Success>();
                 while (true) {
                     System.out.println(String.format("counter: %d", counter));
-                    Document doc = new Document("key", System.currentTimeMillis())
+                    val doc = new Document("key", System.currentTimeMillis())
                             .append("item", "apple")
                             .append("counter", counter++)
                             .append("qty", 11);
@@ -93,7 +94,7 @@ public class Demo {
         thread.start();
     }
 
-    private static void reader(MongoCollection<Document> collection) throws Throwable {
+    private static void subscribeForCollectionChanges(MongoCollection<Document> collection) throws Throwable {
         // Create the change stream publisher.
         ChangeStreamPublisher<Document> publisher = collection.watch();
 
