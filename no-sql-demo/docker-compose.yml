@@ -39,7 +39,7 @@ services:
     expose:
       - 27017
     ports:
-      - 30002:27017
+      - 27018:27017
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
@@ -50,7 +50,7 @@ services:
     expose:
       - 27017
     ports:
-      - 30003:27017
+      - 27019:27017
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 
@@ -61,7 +61,7 @@ services:
       - mongo2
       - mongo3
     volumes:
-      #- /droot/2020_03_27_NoSQL(JavaSE)/src/stack/no-sql-demo/scripts:/scripts
-      - /droot/stack/no-sql-demo/scripts:/scripts
+      - /droot/2020_03_27_NoSQL(JavaSE)/src/stack/no-sql-demo/scripts:/scripts
+      #- /droot/stack/no-sql-demo/scripts:/scripts
     restart: "no"
     entrypoint: [ "bash", "/scripts/mongo_setup.sh"]
