@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.otus</groupId>
-    <artifactId>demo-projects</artifactId>
+    <artifactId>oauth2-example</artifactId>
     <version>1.0</version>
 
     <packaging>pom</packaging>

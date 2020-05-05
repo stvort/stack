@@ -1,7 +1,10 @@
 package ru.otus.resourceserver.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -10,89 +13,41 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import java.util.Collection;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     private static final String RESOURCE_ID = "resource_id";
 
+    @Bean
+    public TokenStore tokenStore() {
+        return new JwtTokenStore(jwtAccessTokenConverter());
+    }
+
+    @Bean
+    public JwtAccessTokenConverter jwtAccessTokenConverter() {
+        var converter = new JwtAccessTokenConverter();
+        converter.setSigningKey("12345");
+        return converter;
+    }
+
     @Override
-    public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.tokenStore(new TokenStore() {
-            @Override
-            public OAuth2Authentication readAuthentication(OAuth2AccessToken token) {
-                return null;
-            }
-
-            @Override
-            public OAuth2Authentication readAuthentication(String token) {
-                return null;
-            }
-
-            @Override
-            public void storeAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
-
-            }
-
-            @Override
-            public OAuth2AccessToken readAccessToken(String tokenValue) {
-                return null;
-            }
-
-            @Override
-            public void removeAccessToken(OAuth2AccessToken token) {
-
-            }
-
-            @Override
-            public void storeRefreshToken(OAuth2RefreshToken refreshToken, OAuth2Authentication authentication) {
-
-            }
-
-            @Override
-            public OAuth2RefreshToken readRefreshToken(String tokenValue) {
-                return null;
-            }
-
-            @Override
-            public OAuth2Authentication readAuthenticationForRefreshToken(OAuth2RefreshToken token) {
-                return null;
-            }
-
-            @Override
-            public void removeRefreshToken(OAuth2RefreshToken token) {
-
-            }
-
-            @Override
-            public void removeAccessTokenUsingRefreshToken(OAuth2RefreshToken refreshToken) {
-
-            }
-
-            @Override
-            public OAuth2AccessToken getAccessToken(OAuth2Authentication authentication) {
-                return null;
-            }
-
-            @Override
-            public Collection<OAuth2AccessToken> findTokensByClientIdAndUserName(String clientId, String userName) {
-                return null;
-            }
-
-            @Override
-            public Collection<OAuth2AccessToken> findTokensByClientId(String clientId) {
-                return null;
-            }
-        }).resourceId(RESOURCE_ID).stateless(false);
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources
+                .resourceId(RESOURCE_ID)
+                .tokenStore(tokenStore())
+        ;
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.
-                anonymous().disable()
+        http.anonymous().disable()
                 .authorizeRequests()
                 .antMatchers("/api/**").authenticated()
                 .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());

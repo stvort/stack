@@ -6,13 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import ru.otus.resourceserver.config.OAuthProps;
-import ru.otus.resourceserver.models.CurrentUserRequestResult;
-
-import java.util.Base64;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -75,6 +69,8 @@ class ResourceServerApplicationTests {
 		System.out.println(currentUserResponse.getStatusCode());
 		System.out.println(currentUserResponse.getHeaders());
 		System.out.println(currentUserResponse.getBody());
+		assertThat(currentUserResponse.getBody())
+                .isNotNull().isEqualTo("{\"userName\":\"user1\"}");
     }
 
 }
