@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+security:
+  oauth2:
+    resource:
+      token-info-uri: "http://localhost:8090/check"
+
+app:
+  oauth2:
+    client-id: "any_id"
+    client-secret: "any_secret"
