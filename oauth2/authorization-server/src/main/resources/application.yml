@@ -5,3 +5,4 @@ app:
   oauth2:
     client-id: "any_id"
     client-secret: "any_secret"
+    signing-key: 987654321

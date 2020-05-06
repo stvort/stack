@@ -7,4 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class CurrentUserRequestResult {
     private String userName;
+    private String firstName;
+    private String fatherName;
 }

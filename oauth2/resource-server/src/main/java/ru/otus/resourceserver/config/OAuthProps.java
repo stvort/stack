@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class OAuthProps {
     private String clientId;
     private String clientSecret;
+    private String signingKey;
 }

@@ -5,17 +5,17 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import ru.otus.authorizationserver.model.CustomUser;
 
-import java.util.Collections;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class InMemoryAuthenticationProvider implements AuthenticationProvider {
 
+    public static final String KEY_FIRST_NAME = "firstName";
+    public static final String KEY_FATHER_NAME = "fatherName";
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -29,17 +29,25 @@ public class InMemoryAuthenticationProvider implements AuthenticationProvider {
             return null;
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
+        final String userName = authentication.getName();
+        final Object password = authentication.getCredentials();
 
-        final String providedUserEmail = authentication.getName();
-        final Object providedUserPassword = authentication.getCredentials();
+        CustomUser userDetails = (CustomUser) userDetailsService.loadUserByUsername(userName);
 
-        if (providedUserEmail.equalsIgnoreCase(userDetails.getUsername())
-                && providedUserPassword.equals(userDetails.getPassword())) {
-            return new UsernamePasswordAuthenticationToken(
+
+        if (userName.equalsIgnoreCase(userDetails.getUsername()) && password.equals(userDetails.getPassword())) {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     userDetails.getUsername(),
                     userDetails.getPassword(),
                     userDetails.getAuthorities());
+
+            token.setDetails(
+                    Map.of(
+                            KEY_FIRST_NAME, userDetails.getFirstName(),
+                            KEY_FATHER_NAME, userDetails.getFatherName()
+                    )
+            );
+            return token;
         }
 
         throw new UsernameNotFoundException("Invalid username or password.");

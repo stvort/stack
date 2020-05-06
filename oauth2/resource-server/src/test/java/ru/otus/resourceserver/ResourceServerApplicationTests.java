@@ -70,7 +70,7 @@ class ResourceServerApplicationTests {
 		System.out.println(currentUserResponse.getHeaders());
 		System.out.println(currentUserResponse.getBody());
 		assertThat(currentUserResponse.getBody())
-                .isNotNull().isEqualTo("{\"userName\":\"user1\"}");
+                .isNotNull().isEqualTo("{\"userName\":\"user1\",\"firstName\":\"Василий\",\"fatherName\":\"Григорьевич\"}");
     }
 
 }

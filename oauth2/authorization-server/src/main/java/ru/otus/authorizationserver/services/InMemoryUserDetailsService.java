@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.otus.authorizationserver.model.CustomUser;
 
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,15 @@ public class InMemoryUserDetailsService implements UserDetailsService {
 
     public InMemoryUserDetailsService(PasswordEncoder passwordEncoder) {
         userMap = Map.of(
-                "user1", new User("user1", passwordEncoder.encode("user1"), List.of(new SimpleGrantedAuthority("ADMIN"))),
-                "user2", new User("user2", passwordEncoder.encode("user2"), List.of(new SimpleGrantedAuthority("USER")))
+                "user1", new CustomUser("Василий", "Григорьевич",
+                        "user1",
+                        passwordEncoder.encode("user1"),
+                        List.of(new SimpleGrantedAuthority("ADMIN"))),
+
+                "user2", new CustomUser("Ираклий", "Спиридонович",
+                        "user2",
+                        passwordEncoder.encode("user2"),
+                        List.of(new SimpleGrantedAuthority("USER")))
         );
     }
 
